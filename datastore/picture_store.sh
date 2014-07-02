@@ -2,5 +2,5 @@
 #This script executes GAE
 
 
-dev_appserver.py Guestbook
+dev_appserver.py Picturebook
 

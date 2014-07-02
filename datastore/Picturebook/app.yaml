@@ -1,4 +1,4 @@
-application: your-app-id
+application: sagebears-datastore
 version: 1
 runtime: python27
 api_version: 1
@@ -6,7 +6,7 @@ threadsafe: true
 
 handlers:
 - url: /.*
-  script: guestbook.application
+  script: picturestore.application
 
 libraries:
 - name: webapp2
