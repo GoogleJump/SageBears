@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.google.gson.*;
 
 import java.io.File;
 
@@ -38,6 +40,12 @@ public class MainActivity extends ActionBarActivity {
 
     /** Used as a key for determining whether or not a photo has been taken */
     protected static final String PHOTO_TAKEN = "photo_taken";
+
+    /** Current Image Object */
+    protected Image _currentImage;
+
+    /** Current serialized Image Object */
+    protected String _myJSonImage;
 
 
     /** Automatically generated method which was modified to handle android widget assignment */
@@ -94,6 +102,12 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+    /** Serializes the given JSON image object */
+    protected void serializeImage (Image toSerialize) {
+        Gson gson = new Gson();
+        _myJSonImage = gson.toJson(toSerialize);
+    }
+
     /** Changes the appropriate booleans and constants to their post-picture state
      *  and also down samples image size to save on frivolous space usage. */
     protected void onPhotoTaken()
@@ -105,8 +119,11 @@ public class MainActivity extends ActionBarActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
         _image.setImageBitmap(bitmap);
+        _currentImage = new Image(_image);
+        serializeImage(_currentImage);
 
         _field.setVisibility( View.GONE );
+
     }
 
     /** Prevents camera rotation error which causes pictures to disappear */
@@ -141,6 +158,58 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public class Image {
+
+        /** My username */
+        public String username;
+
+        /** My user ID */
+        public String user_id;
+
+        /** My physical photo data */
+        public ImageView photo;
+
+        /** The date I was captured */
+        public String date;
+
+        /** My coordinates as a two element float array */
+        public float[] my_coordinates;
+
+        Image(ImageView foto) {
+            this.photo = foto;
+            this.username = "not specified";
+            this.user_id = "not specified";
+        }
+
+        Image(ImageView foto, String name) {
+            this.photo = foto;
+            this.username = name;
+            this.user_id = "not specified";
+        }
+
+        Image(ImageView foto, String name, String ID) {
+            this.photo = foto;
+            this.username = name;
+            this.user_id = ID;
+        }
+
+        public ImageView getPhoto() {
+            return photo;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public String getUser_id() {
+            return user_id;
+        }
+
+        public String getUsername() {
+            return username;
+        }
     }
 
 }
