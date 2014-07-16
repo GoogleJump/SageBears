@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+    </head>
+
+    <h2 style="text-align: center;">Submit and View Photo Info</h2>
+
+    <body>
+
+        <div class="ui two column grid stackable">
+            
+            <!-- left column of grid -->
+            <div class="column">
+                <form action="/store" enctype="multipart/form-data" method="post">
+
+                    <div class="ui form">
+                        <div class="field">
+                            <label>JSON information</label>
+                            <textarea name="given_json"></textarea>
+                        </div>
+                    </div>
+
+                    <div><label>Photo:</label></div>
+                    <div><input type="file" name="img"/></div>
+
+                    <input class="ui small primary green button" type="submit" value="Store Picture Info">
+
+                    <!-- login/logout button -->
+                    <a class="ui small primary red button" href="{{ url|safe }}">{{ url_linktext }}</a>
+                </form>
+                <hr>
+                <form>Picturebook name: 
+                    <input value="default_picturebook" name="picturebook_name">
+                    <input type="submit" value="switch">
+                </form>
+            </div>
+                    
+            <div class="column">
+                <!-- right column of grid -->
+                Stored Pictures
+                {% for image in images %}
+                    {% if image.username %}
+                        <b>{{ image.username }}</b> on {{ image.date }} submitted this photo:
+                    {% else %}
+                        An anonymous person on {{ image.date }} submitted this photo:
+                    {% endif %}
+
+                    {{ image.photo }} <br> <br>
+
+                {% endfor %}
+            </div>
+
+        </div>
+    </body>
+</html>
+{% endautoescape %}
