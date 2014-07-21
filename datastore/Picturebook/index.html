@@ -4,21 +4,9 @@
     <head>
         <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 
-        <!--
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASjDWc86gJ9mZy2enIALatdFp4yj94A4A">
+        <!-- -->
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNrgeBzBMFdOTdEJy5Iv3M-vvXOn07LOg">
         </script>
-        <script type="text/javascript">
-            function initialize() {
-            var mapOptions = {
-                center: new google.maps.LatLng(-34.397, 150.644),
-                zoom: 8
-            };
-            var map = new google.maps.Map(document.getElementById("map-canvas"),
-                mapOptions);
-            }
-            google.maps.event.addDomListener(window, 'load', initialize);
-        </script>
-        -->
     </head>
 
     <h2 style="text-align: center;">Submit and View Photo Info</h2>
@@ -52,11 +40,47 @@
                     <input type="submit" value="switch">
                 </form>
             </div>
-                    
+            
+            <!-- right column of grid -->        
             <div class="column">
-                <!-- right column of grid -->
                 Stored Pictures
-                <div id="map-canvas"></div>
+                <div id="map-canvas" style="width: auto; height: 400px;"></div>
+
+                <script type="text/javascript">
+                    function initialize() {
+                        var goog = new google.maps.LatLng(37.386052, -122.083851);
+
+                        var mapOptions = {
+                            center: goog,
+                            zoom: 8
+                        };
+                        
+                        var map = new google.maps.Map(document.getElementById("map-canvas"),
+                            mapOptions);
+                       
+
+                        var marker = new google.maps.Marker({
+                            position: goog,
+                            map: map,
+                            title:"google"
+                        });
+
+                        var contentString = '<h2> Google </h2>';
+
+                        var infowindow = new google.maps.InfoWindow({
+                              content: contentString
+                        });
+
+                        google.maps.event.addListener(marker, 'click', function() {
+                            infowindow.open(map,marker);
+                        });
+                    }
+
+                    google.maps.event.addDomListener(window, 'load', initialize);
+
+                </script>
+                <br>
+
                 {% for image in images %}
                     {% if image.username %}
                         <b>{{ image.username }}</b> on {{ image.date }} submitted this photo:
