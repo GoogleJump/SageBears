@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,9 +17,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -47,6 +52,9 @@ public class MainActivity extends ActionBarActivity {
     /** Current serialized Image Object */
     protected String _myJSonImage;
 
+    /** Tage reference used for debugging print statements sent to the console */
+    private static final String TAG = "MainActivity";
+
 
     /** Automatically generated method which was modified to handle android widget assignment */
     @Override
@@ -60,29 +68,52 @@ public class MainActivity extends ActionBarActivity {
         _field = (TextView) findViewById( R.id.field );
         _button = (Button) findViewById( R.id.button );
         _button.setOnClickListener( new ButtonClickHandler() );
-
-        _path = Environment.getExternalStorageDirectory() + "/images/make_machine_example.jpg";
+        //_path = new File(Environment.getExternalStorageDirectory().getPath() + "/images/");
+        //_path = Environment.getExternalStorageDirectory().getPath() + "/images/";
     }
 
     /** Method which prepares intent to actually take a picture */
     public class ButtonClickHandler implements View.OnClickListener
     {
         public void onClick( View view ){
-            startCameraActivity();
+            try {
+                startCameraActivity();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
 
-    /** Method which creates an intent object to start the camera functionality. */
-    protected void startCameraActivity()
-    {
-        File file = new File( _path );
+    /** Method which creates an intent object to start the camera functionality.
+     *  (Should apparently circumvent the need to declare camera use permissions.) */
+
+      protected void startCameraActivity() throws IOException {
+        File file = createImageFile();
+        file.mkdirs();
         Uri outputFileUri = Uri.fromFile( file );
 
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE );
         intent.putExtra( MediaStore.EXTRA_OUTPUT, outputFileUri );
 
-        startActivityForResult( intent, 0 );
+        startActivityForResult( intent, 11 );
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        _path = image.getAbsolutePath();
+        return image;
     }
 
     /** Handles user camera interaction, such as returning after user is done. */
@@ -97,10 +128,13 @@ public class MainActivity extends ActionBarActivity {
                 break;
 
             case -1:
+                Log.i( "MakeMachine", "User took photo" );
                 onPhotoTaken();
                 break;
         }
     }
+
+
 
     /** Serializes the given JSON image object */
     protected void serializeImage (Image toSerialize) {
@@ -118,12 +152,25 @@ public class MainActivity extends ActionBarActivity {
         options.inSampleSize = 4;
 
         Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
+        String bitmap_sender = BitMapToString(bitmap);
+        Log.i("MakeMachine", "bitmap to string = " + bitmap_sender);
         _image.setImageBitmap(bitmap);
         _currentImage = new Image(_image);
-        serializeImage(_currentImage);
+
+
+     //   serializeImage(_currentImage);
+
 
         _field.setVisibility( View.GONE );
+    }
 
+    /** Method from stack overflow which converts a bitmap into a string */
+    public String BitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream ByteStream=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, ByteStream);
+        byte [] b=ByteStream.toByteArray();
+        String temp=Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
 
     /** Prevents camera rotation error which causes pictures to disappear */
@@ -159,6 +206,7 @@ public class MainActivity extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public class Image {
 
