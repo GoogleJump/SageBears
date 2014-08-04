@@ -60,16 +60,18 @@
 
                     function initialize() {
                         
+                    }
+
+                    function add_marker(lat, lon, details) {
+                        var location = new google.maps.LatLng(lat, lon);
                         var marker = new google.maps.Marker({
-                            position: goog,
+                            position: location,
                             map: map,
-                            title:"google"
+                            title: 'YAY NEW LOCATION!!!'
                         });
 
-                        var contentString = '<h2> Google </h2>';
-
-                        var infowindow = new google.maps.InfoWindow({
-                              content: contentString
+                        var infowindow =  new google.maps.InfoWindow({
+                            content: details
                         });
 
                         google.maps.event.addListener(marker, 'click', function() {
@@ -77,31 +79,41 @@
                         });
                     }
 
-                    function add_marker(lat, lon) {
-                        var location = new google.maps.LatLng(lat, lon);
-                        var marker = new google.maps.Marker({
-                            position: location,
-                            map: map,
-                            title: "YAY NEW LOCATION!!!"
-                        });
-                    }
-
                     google.maps.event.addDomListener(window, 'load', initialize);
 
                 </script>
+
                 <br>
 
                 {% for image in images %}
-                    {% if image.username %}
-                        <b>{{ image.username }}</b> on {{ image.date }} submitted this photo:
-                    {% else %} 
-                        An anonymous person on {{ image.date }} submitted this photo:
+                    <!-- add marker if there are latitude and longitude values -->
+                    {% if image.lat and image.lon %}
+                        {% if image.username %}
+                            <script type="text/javascript"> 
+                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo:");
+                                google.maps.event.addDomListener(window, 'load', add_marker);
+                            </script>
+                        {% else %}
+                            <script type="text/javascript"> 
+                                add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo:");
+                                google.maps.event.addDomListener(window, 'load', add_marker);
+                            </script>
+                        {% endif %}
                     {% endif %}
 
-                    {{ image.photo }} <br> <br>
-                    <script type="text/javascript"> 
-                        add_marker({{image.lat}}, {{image.lon}});
-                        google.maps.event.addDomListener(window, 'load', add_marker);
+                    <br>
+
+                    <canvas id="canvas"></canvas>
+
+                    <script type="text/javascript">
+                        // loads the image from the base64 json image data in canvas
+                        var canvas = document.getElementById('canvas');
+                        var context = canvas.getContext('2d');
+                        var img = new Image();
+                        img.onload = function () {
+                            context.drawImage(this, 0, 0, canvas.width, canvas.height);
+                        }
+                        img.src = "data:image/png;base64,{{image.photo}}";
                     </script>
 
                 {% endfor %}
