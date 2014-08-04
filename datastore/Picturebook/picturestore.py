@@ -34,6 +34,8 @@ class Image(ndb.Model):
     user_id = ndb.StringProperty()
     date = ndb.StringProperty()
     photo = ndb.TextProperty()
+    lat = ndb.FloatProperty()
+    lon = ndb.FloatProperty()
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -87,6 +89,8 @@ class PictureStore(webapp2.RequestHandler):
         image.username = parsed_json['username']
         image.user_id = parsed_json['user_id']
         image.date = parsed_json['date']
+        image.lat = parsed_json['lat']
+        image.lon = parsed_json['lon']
 
         #convert image to string using base64 so we store it and use it in json later
         with open(os.path.join(os.path.dirname(__file__), self.request.params["img"].filename), "rb") as imageFile:
