@@ -189,7 +189,11 @@ public class MainActivity extends ActionBarActivity {
             try {
                 HttpClient httpclient = new DefaultHttpClient();
                 HttpPost httppost = new HttpPost("http://sagebears-datastore.appspot.com/store");
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = 4;
 
+                Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
+                String bitmap_sender = BitMapToString(bitmap);
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(5);
                 nameValuePairs.add(new BasicNameValuePair("username", "Bob"));
@@ -197,6 +201,7 @@ public class MainActivity extends ActionBarActivity {
                 nameValuePairs.add(new BasicNameValuePair("date", "some date"));
                 nameValuePairs.add(new BasicNameValuePair("lat", "37"));
                 nameValuePairs.add(new BasicNameValuePair("lon", "-122"));
+                nameValuePairs.add(new BasicNameValuePair("image", bitmap_sender));
 
 //                HashMap<String, String> preJSON = new HashMap<String, String>();
 //                preJSON.put("username", "Bob");
