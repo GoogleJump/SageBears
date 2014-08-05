@@ -67,7 +67,7 @@
                     function add_marker(lat, lon, details, photo) {
                         //alert('maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon + '&sensor=true');
                         var geocoder = new google.maps.Geocoder();
-                        var location = new google.maps.LatLng(lat, lon);
+                        var location = new google.maps.LatLng(parseFloat(lat), parseFloat(lon));
                         var infowindow = new google.maps.InfoWindow();
                         var content = details;
 
