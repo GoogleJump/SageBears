@@ -93,9 +93,9 @@ class PictureStore(webapp2.RequestHandler):
         image.lon = self.request.get('lon')
 
         #convert image to string using base64 so we store it and use it in json later
-        with open(os.path.join(os.path.dirname(__file__), self.request.params["img"].filename), "rb") as imageFile:
-            img_string = base64.b64encode(imageFile.read())
-            image.photo = img_string
+    #    with open(os.path.join(os.path.dirname(__file__), self.request.params["img"].filename), "rb") as imageFile:
+    #        img_string = base64.b64encode(imageFile.read())
+    #        image.photo = img_string
         
         #stores image info
         image.put()

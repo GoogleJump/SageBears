@@ -195,7 +195,7 @@ public class MainActivity extends ActionBarActivity {
                 nameValuePairs.add(new BasicNameValuePair("username", "Bob"));
                 nameValuePairs.add(new BasicNameValuePair("user_id", "123"));
                 nameValuePairs.add(new BasicNameValuePair("date", "some date"));
-                nameValuePairs.add(new BasicNameValuePair("lat", 37));
+                nameValuePairs.add(new BasicNameValuePair("lat", "37"));
                 nameValuePairs.add(new BasicNameValuePair("lon", "-122"));
 
 //                HashMap<String, String> preJSON = new HashMap<String, String>();
