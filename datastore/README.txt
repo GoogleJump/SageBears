@@ -11,6 +11,6 @@ line 113:
 This part: os.path.join(os.path.dirname(__file__) #gets my path in the folder I'm in for this project
 This part: self.request.params["img"].filename   #is something like "dachshund.jpg"
 
-The first part will have to be changed to fit the android stuff and get an image from there. We need it give the app engine JSON info like this {"username": "Puppy", "user_id": "1", "date": "8/3/14", "lat": 12, "lon": -123} and an image. 
+The first part will have to be changed to fit the android stuff and get an image from there. We need it give the app engine JSON info like this {"username": "Puppy", "user_id": "1", "date": "8/3/14", "lat": 34.05, "lon": -118.25} and an image. 
 
 
