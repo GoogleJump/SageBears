@@ -9,7 +9,7 @@
         </script>
     </head>
 
-    <h2 style="text-align: center;">Submit and View Photo Info</h2>
+    <h2 style="text-align: center;">Tag</h2>
 
     <body>
 
@@ -50,10 +50,6 @@
 
                     //original stuff
                     var goog = new google.maps.LatLng(37.386052, -122.083851);
-                    var infowindow = new google.maps.InfoWindow();
-                    var map;
-                    var geocoder = new google.maps.Geocoder();
-                    var marker;
 
                     var mapOptions = {
                         zoom: 6,
@@ -61,7 +57,7 @@
                         mapTypeId: 'roadmap'
                     }
 
-                    map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+                    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
                     function initialize() {
 
@@ -70,8 +66,9 @@
                     // add marker for every photo saved
                     function add_marker(lat, lon, details, photo) {
                         //alert('maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon + '&sensor=true');
-
+                        var geocoder = new google.maps.Geocoder();
                         var location = new google.maps.LatLng(lat, lon);
+                        var infowindow = new google.maps.InfoWindow();
                         var marker = new google.maps.Marker({
                             position: location,
                             map: map
@@ -80,7 +77,7 @@
                         geocoder.geocode({'latLng': location}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 if (results[1]) {
-                                    infowindow.setContent('' + details + ' in ' + results[7].formatted_address + ": <br>" + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">');
+                                    infowindow.setContent('' + details + ' in ' + results[7].formatted_address + ': <br>' + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">');
                                 }
                                 else {
                                     alert('No results found and the status is: ' + status);
