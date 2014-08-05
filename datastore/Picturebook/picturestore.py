@@ -34,8 +34,8 @@ class Image(ndb.Model):
     user_id = ndb.StringProperty()
     date = ndb.StringProperty()
     photo = ndb.TextProperty()
-    lat = ndb.FloatProperty()
-    lon = ndb.FloatProperty()
+    lat = ndb.StringProperty()
+    lon = ndb.StringProperty()
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
