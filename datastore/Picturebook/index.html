@@ -50,7 +50,7 @@
 
                     //original stuff
                     var goog = new google.maps.LatLng(37.386052, -122.083851);
-                    var infowindow;
+                    var infowindow = new google.maps.InfoWindow();
                     var map;
                     var geocoder = new google.maps.Geocoder();
                     var marker;
@@ -80,12 +80,8 @@
                         geocoder.geocode({'latLng': location}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 if (results[1]) {
-                                    
-                                    infowindow =  new google.maps.InfoWindow({
-                                        content: '' + details + ' in ' + results[7].formatted_address + ": <br>" + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">'
-                                    });
+                                    infowindow.setContent('' + details + ' in ' + results[7].formatted_address + ": <br>" + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">');
                                 }
-
                                 else {
                                     alert('No results found and the status is: ' + status);
                                 }
