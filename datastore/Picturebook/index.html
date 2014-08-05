@@ -105,8 +105,6 @@
                 </script>
 
                 <br>
-
-                <canvas id="canvas" ></canvas>
                 
                 {% for image in images %}
                     <!-- add marker if there are latitude and longitude values -->
@@ -127,22 +125,6 @@
                         {% endif %}
 
                     {% endif %}
-
-                    <br>
-                    
-                    <script type="text/javascript">
-                        // loads the image from the base64 json image data in canvas
-                        var canvas = document.getElementById('canvas');
-                        
-                        var context = canvas.getContext('2d');
-                        var img = new Image();
-                        img.src = "data:image/png;base64,{{image.photo}}";
-                        img.onload = function () {
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            context.drawImage(this, 0, 0, img.width, img.height);
-                        }
-                    </script>
 
                 {% endfor %}
             </div>
