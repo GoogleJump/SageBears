@@ -85,12 +85,12 @@ class PictureStore(webapp2.RequestHandler):
         image = Image(parent=picturebook_key(picturebook_name))
 
         #get json input
-        parsed_json = json.loads(self.request.get('given_json'))  #takes in JSON
-        image.username = parsed_json['username']
-        image.user_id = parsed_json['user_id']
-        image.date = parsed_json['date']
-        image.lat = parsed_json['lat']
-        image.lon = parsed_json['lon']
+        #parsed_json = json.loads(self.request.get('given_json'))  #takes in JSON
+        image.username = self.request.get('username')
+        image.user_id = self.request.get('user_id')
+        image.date = self.request.get('date')
+        image.lat = self.request.get('lat')
+        image.lon = self.request.get('lon')
 
         #convert image to string using base64 so we store it and use it in json later
         with open(os.path.join(os.path.dirname(__file__), self.request.params["img"].filename), "rb") as imageFile:

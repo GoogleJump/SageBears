@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,11 +20,25 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -129,7 +144,13 @@ public class MainActivity extends ActionBarActivity {
 
             case -1:
                 Log.i( "MakeMachine", "User took photo" );
-                onPhotoTaken();
+                try {
+                    onPhotoTaken();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }
@@ -144,8 +165,7 @@ public class MainActivity extends ActionBarActivity {
 
     /** Changes the appropriate booleans and constants to their post-picture state
      *  and also down samples image size to save on frivolous space usage. */
-    protected void onPhotoTaken()
-    {
+    protected void onPhotoTaken() throws IOException, JSONException {
         _taken = true;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -155,14 +175,70 @@ public class MainActivity extends ActionBarActivity {
         String bitmap_sender = BitMapToString(bitmap);
         Log.i("MakeMachine", "bitmap to string = " + bitmap_sender);
         _image.setImageBitmap(bitmap);
+
         _currentImage = new Image(_image);
-
-
-     //   serializeImage(_currentImage);
-
-
+        FetchTask poster = new FetchTask();
+        poster.execute();
         _field.setVisibility( View.GONE );
     }
+
+
+    public class FetchTask extends AsyncTask<Void, Void, JSONArray> {
+        @Override
+        protected JSONArray doInBackground(Void... params) {
+            try {
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost("http://sagebears-datastore.appspot.com/store");
+
+                // Add your data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(5);
+                nameValuePairs.add(new BasicNameValuePair("username", "Bob"));
+                nameValuePairs.add(new BasicNameValuePair("user_id", "123"));
+                nameValuePairs.add(new BasicNameValuePair("date", "some date"));
+                nameValuePairs.add(new BasicNameValuePair("lat", "37"));
+                nameValuePairs.add(new BasicNameValuePair("lon", "-122"));
+//                HashMap<String, String> preJSON = new HashMap<String, String>();
+//                preJSON.put("username", "Bob");
+//                preJSON.put("user_id", "123");
+//                preJSON.put("date", "some date");
+//                preJSON.put("lat", "37");
+//                preJSON.put("long", "-122");
+//                JSONObject json = new JSONObject(preJSON);
+//                StringEntity se = new StringEntity(json.toString());
+          //      Log.i("MakeMachine", "JSON Object made into string BEFORE its sent: " + json.toString());
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+               // httppost.setEntity(se);
+
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "iso-8859-1"), 8);
+                StringBuilder sb = new StringBuilder();
+                sb.append(reader.readLine() + "\n");
+                String line = "0";
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                reader.close();
+                String result11 = sb.toString();
+                Log.i("MakeMachine", "HTTP Response made into string: " + result11);
+                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(JSONArray result) {
+            if (result != null) {
+                // do something
+            } else {
+                // error occured
+            }
+        }
+    }
+
 
     /** Method from stack overflow which converts a bitmap into a string */
     public String BitMapToString(Bitmap bitmap){
@@ -183,7 +259,13 @@ public class MainActivity extends ActionBarActivity {
     {
         Log.i( "MakeMachine", "onRestoreInstanceState()");
         if( savedInstanceState.getBoolean( MainActivity.PHOTO_TAKEN ) ) {
-            onPhotoTaken();
+            try {
+                onPhotoTaken();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -210,19 +292,33 @@ public class MainActivity extends ActionBarActivity {
 
     public class Image {
 
-        /** My username */
+        //username, user_id, date, lat, lon
+        //{"username": "Bob", "user_id": "123", "date": "some date", "lat": 37, "lon": -122}
+
+
+        /**
+         * My username
+         */
         public String username;
 
-        /** My user ID */
+        /**
+         * My user ID
+         */
         public String user_id;
 
-        /** My physical photo data */
+        /**
+         * My physical photo data
+         */
         public ImageView photo;
 
-        /** The date I was captured */
+        /**
+         * The date I was captured
+         */
         public String date;
 
-        /** My coordinates as a two element float array */
+        /**
+         * My coordinates as a two element float array
+         */
         public float[] my_coordinates;
 
         Image(ImageView foto) {
@@ -243,21 +339,6 @@ public class MainActivity extends ActionBarActivity {
             this.user_id = ID;
         }
 
-        public ImageView getPhoto() {
-            return photo;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public String getUser_id() {
-            return user_id;
-        }
-
-        public String getUsername() {
-            return username;
-        }
     }
 
 }
