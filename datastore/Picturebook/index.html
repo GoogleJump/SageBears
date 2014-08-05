@@ -69,15 +69,12 @@
                         var geocoder = new google.maps.Geocoder();
                         var location = new google.maps.LatLng(lat, lon);
                         var infowindow = new google.maps.InfoWindow();
-                        var marker = new google.maps.Marker({
-                            position: location,
-                            map: map
-                        });
+                        var content = details;
 
                         geocoder.geocode({'latLng': location}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 if (results[1]) {
-                                    infowindow.setContent('' + details + ' in ' + results[7].formatted_address + ': <br>' + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">');
+                                    content = content + ' in ' + results[7].formatted_address;
                                 }
                                 else {
                                     alert('No results found and the status is: ' + status);
@@ -88,8 +85,17 @@
                             }
                         });
 
+                        content = content + ': <br>' + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">';
+
+                        var marker = new google.maps.Marker({
+                            position: location,
+                            map: map,
+                            html: content
+                        });
+
                         google.maps.event.addListener(marker, 'click', function() {
-                            infowindow.open(map,marker);
+                            infowindow.setContent(this.html);
+                            infowindow.open(map,this);
                         });
                     }
 
