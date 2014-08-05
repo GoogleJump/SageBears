@@ -64,10 +64,11 @@
 
                     function add_marker(lat, lon, details) {
                         var location = new google.maps.LatLng(lat, lon);
+                        //var name = maps.googleapis.com/maps/api/geocode/json?latlng=lat,lng&sensor=true;
                         var marker = new google.maps.Marker({
                             position: location,
                             map: map,
-                            title: 'YAY NEW LOCATION!!!'
+                            title: name //lat + lon gives the actual place like SF
                         });
 
                         var infowindow =  new google.maps.InfoWindow({
@@ -83,6 +84,7 @@
 
                 </script>
 
+                <canvas id="canvas" ></canvas>
                 <br>
 
                 {% for image in images %}
@@ -90,7 +92,8 @@
                     {% if image.lat and image.lon %}
                         {% if image.username %}
                             <script type="text/javascript"> 
-                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo:");
+                                details = "{{ image.username }} on {{ image.date }} submitted this photo:"
+                                add_marker({{image.lat}}, {{image.lon}}, details);
                                 google.maps.event.addDomListener(window, 'load', add_marker);
                             </script>
                         {% else %}
@@ -102,18 +105,19 @@
                     {% endif %}
 
                     <br>
-
-                    <canvas id="canvas"></canvas>
-
+                    
                     <script type="text/javascript">
                         // loads the image from the base64 json image data in canvas
                         var canvas = document.getElementById('canvas');
+                        
                         var context = canvas.getContext('2d');
                         var img = new Image();
-                        img.onload = function () {
-                            context.drawImage(this, 0, 0, canvas.width, canvas.height);
-                        }
                         img.src = "data:image/png;base64,{{image.photo}}";
+                        img.onload = function () {
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            context.drawImage(this, 0, 0, img.width, img.height);
+                        }
                     </script>
 
                 {% endfor %}
