@@ -201,7 +201,7 @@ public class MainActivity extends ActionBarActivity {
                 nameValuePairs.add(new BasicNameValuePair("date", "some date"));
                 nameValuePairs.add(new BasicNameValuePair("lat", "37"));
                 nameValuePairs.add(new BasicNameValuePair("lon", "-122"));
-                nameValuePairs.add(new BasicNameValuePair("image", bitmap_sender));
+                nameValuePairs.add(new BasicNameValuePair("photo", bitmap_sender));
 
 //                HashMap<String, String> preJSON = new HashMap<String, String>();
 //                preJSON.put("username", "Bob");
