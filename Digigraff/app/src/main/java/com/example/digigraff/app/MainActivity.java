@@ -83,6 +83,9 @@ public class MainActivity extends ActionBarActivity {
     /** Pseudo-boolean which is 0 before the username is changed and 1 after */
     protected int _alreadyset = 0;
 
+    /** Text which displays after pictures are taken */
+    protected TextView _recentTagText;
+
 
     /** Automatically generated method which was modified to handle android widget assignment */
     @Override
@@ -94,6 +97,7 @@ public class MainActivity extends ActionBarActivity {
 
         _image = (ImageView) findViewById( R.id.image );
         _field = (TextView) findViewById( R.id.field );
+        _recentTagText = (TextView) findViewById( R.id.digitags);
 
         _button = (Button) findViewById( R.id.button );
         _button.setOnClickListener(new ButtonClickHandler());
@@ -215,11 +219,12 @@ public class MainActivity extends ActionBarActivity {
         Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
         String bitmap_sender = BitMapToString(bitmap);
         Log.i("MakeMachine", "bitmap to string = " + bitmap_sender);
+        _recentTagText.setVisibility(View.VISIBLE);
         _image.setImageBitmap(bitmap);
 
     //    locationSnapUp();
 
-        FetchTask poster = new FetchTask();
+        HTTPTask poster = new HTTPTask();
         poster.execute();
         _field.setVisibility(View.GONE);
     }
@@ -260,7 +265,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
-    public class FetchTask extends AsyncTask<Void, Void, JSONArray> {
+    public class HTTPTask extends AsyncTask<Void, Void, JSONArray> {
         @Override
         protected JSONArray doInBackground(Void... params) {
             try {
@@ -279,8 +284,13 @@ public class MainActivity extends ActionBarActivity {
                 Log.i("MakeMachine", "This is what was passed in for a username: " + _username);
                 Calendar c = Calendar.getInstance();
                 int seconds = c.get(Calendar.MILLISECOND);
+                int month = c.get(Calendar.MONTH);
+                int day = c.get(Calendar.DAY_OF_MONTH);
+                int year = c.get(Calendar.YEAR);
+                String date_str = ((month + 1) + "") + "/" + (day + "") + "/" + (year + "");
+                Log.i("MakeMachine", "This is what I think today's date is: " + date_str);
                 nameValuePairs.add(new BasicNameValuePair("user_id", _username.hashCode() + seconds + ""));
-                nameValuePairs.add(new BasicNameValuePair("date", "08/06/14"));
+                nameValuePairs.add(new BasicNameValuePair("date", date_str));
          //       nameValuePairs.add(new BasicNameValuePair("lat", _latitude + ""));
          //       nameValuePairs.add(new BasicNameValuePair("lon", _longitude + ""));
                 nameValuePairs.add(new BasicNameValuePair("lon", "-122.0840"));
