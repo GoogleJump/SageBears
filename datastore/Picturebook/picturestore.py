@@ -53,7 +53,7 @@ class MainPage(webapp2.RequestHandler):
         #following returns last 3 image stores
         images_query = Image.query(
             ancestor=picturebook_key(picturebook_name)).order(-Image.date)
-        images = images_query.fetch(5)
+        images = images_query.fetch(10)
 
         if users.get_current_user():    
             url = users.create_logout_url(self.request.uri)
