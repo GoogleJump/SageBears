@@ -1,8 +1,15 @@
 package com.example.digigraff.app;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.media.Image;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,10 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.gson.Gson;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -37,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +62,9 @@ public class MainActivity extends ActionBarActivity {
     /** File path where pictures will be stored after being taken */
     protected String _path;
 
+    /** File path where pictures will be stored after being taken */
+    public String _username;
+
     /** Boolean value which is true only when a picture has been taken */
     protected boolean _taken;
 
@@ -64,11 +74,14 @@ public class MainActivity extends ActionBarActivity {
     /** Current Image Object */
     protected Image _currentImage;
 
-    /** Current serialized Image Object */
-    protected String _myJSonImage;
+    /** Most Recent Longitude Value */
+    protected Double _longitude;
 
-    /** Tage reference used for debugging print statements sent to the console */
-    private static final String TAG = "MainActivity";
+    /** Most Recent Latitude Value */
+    protected Double _latitude;
+
+    /** Pseudo-boolean which is 0 before the username is changed and 1 after */
+    protected int _alreadyset = 0;
 
 
     /** Automatically generated method which was modified to handle android widget assignment */
@@ -81,10 +94,45 @@ public class MainActivity extends ActionBarActivity {
 
         _image = (ImageView) findViewById( R.id.image );
         _field = (TextView) findViewById( R.id.field );
+
         _button = (Button) findViewById( R.id.button );
-        _button.setOnClickListener( new ButtonClickHandler() );
-        //_path = new File(Environment.getExternalStorageDirectory().getPath() + "/images/");
-        //_path = Environment.getExternalStorageDirectory().getPath() + "/images/";
+        _button.setOnClickListener(new ButtonClickHandler());
+        if (_alreadyset == 0) {
+            usernameRequest();
+        }
+    }
+
+    /** Request Username from user and change internal field */
+    public void usernameRequest() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+        alert.setTitle("Welcome to DigiGraff!");
+        alert.setMessage("Please Enter Your Username Below");
+
+// Set an EditText view to get user input
+        final EditText input = new EditText(this);
+        alert.setView(input);
+
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                if (input.getText().toString() != null) {
+                    _alreadyset = 1;
+                    _username = input.getText().toString();
+                } else {
+                    _username = "Eugene Wang";
+                }
+
+                // Do something with value!
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // Canceled.
+            }
+        });
+
+        alert.show();
     }
 
     /** Method which prepares intent to actually take a picture */
@@ -93,6 +141,7 @@ public class MainActivity extends ActionBarActivity {
         public void onClick( View view ){
             try {
                 startCameraActivity();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -110,7 +159,6 @@ public class MainActivity extends ActionBarActivity {
 
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE );
         intent.putExtra( MediaStore.EXTRA_OUTPUT, outputFileUri );
-
         startActivityForResult( intent, 11 );
     }
 
@@ -136,6 +184,7 @@ public class MainActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         Log.i("MakeMachine", "resultCode: " + resultCode);
+
         switch( resultCode )
         {
             case 0:
@@ -155,14 +204,6 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-
-
-    /** Serializes the given JSON image object */
-    protected void serializeImage (Image toSerialize) {
-        Gson gson = new Gson();
-        _myJSonImage = gson.toJson(toSerialize);
-    }
-
     /** Changes the appropriate booleans and constants to their post-picture state
      *  and also down samples image size to save on frivolous space usage. */
     protected void onPhotoTaken() throws IOException, JSONException {
@@ -176,10 +217,46 @@ public class MainActivity extends ActionBarActivity {
         Log.i("MakeMachine", "bitmap to string = " + bitmap_sender);
         _image.setImageBitmap(bitmap);
 
-        _currentImage = new Image(_image);
+    //    locationSnapUp();
+
         FetchTask poster = new FetchTask();
         poster.execute();
-        _field.setVisibility( View.GONE );
+        _field.setVisibility(View.GONE);
+    }
+
+    /** Updates the GPS latitude and longitude */
+    public void locationSnapUp() {
+
+
+        final LocationListener locationListener = new LocationListener() {
+            Double longitude;
+            Double latitude;
+            public void onLocationChanged(Location location) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, locationListener);
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        _longitude = location.getLongitude();
+        _latitude = location.getLatitude();
     }
 
 
@@ -191,29 +268,28 @@ public class MainActivity extends ActionBarActivity {
                 HttpPost httppost = new HttpPost("http://sagebears-datastore.appspot.com/store");
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inSampleSize = 4;
-
                 Bitmap bitmap = BitmapFactory.decodeFile( _path, options );
                 String bitmap_sender = BitMapToString(bitmap);
+
+
                 // Add your data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(5);
-                nameValuePairs.add(new BasicNameValuePair("username", "Bob"));
-                nameValuePairs.add(new BasicNameValuePair("user_id", "123"));
-                nameValuePairs.add(new BasicNameValuePair("date", "some date"));
-                nameValuePairs.add(new BasicNameValuePair("lat", "37"));
-                nameValuePairs.add(new BasicNameValuePair("lon", "-122"));
-                nameValuePairs.add(new BasicNameValuePair("photo", bitmap_sender));
+                nameValuePairs.add(new BasicNameValuePair("username", _username));
 
-//                HashMap<String, String> preJSON = new HashMap<String, String>();
-//                preJSON.put("username", "Bob");
-//                preJSON.put("user_id", "123");
-//                preJSON.put("date", "some date");
-//                preJSON.put("lat", "37");
-//                preJSON.put("long", "-122");
-//                JSONObject json = new JSONObject(preJSON);
-//                StringEntity se = new StringEntity(json.toString());
-          //      Log.i("MakeMachine", "JSON Object made into string BEFORE its sent: " + json.toString());
+                Log.i("MakeMachine", "This is what was passed in for a username: " + _username);
+                Calendar c = Calendar.getInstance();
+                int seconds = c.get(Calendar.MILLISECOND);
+                nameValuePairs.add(new BasicNameValuePair("user_id", _username.hashCode() + seconds + ""));
+                nameValuePairs.add(new BasicNameValuePair("date", "08/06/14"));
+         //       nameValuePairs.add(new BasicNameValuePair("lat", _latitude + ""));
+         //       nameValuePairs.add(new BasicNameValuePair("lon", _longitude + ""));
+                nameValuePairs.add(new BasicNameValuePair("lon", "-122.0840"));
+                nameValuePairs.add(new BasicNameValuePair("lat", "37.4220"));
+                nameValuePairs.add(new BasicNameValuePair("photo", bitmap_sender));
+        //        Log.i("MakeMachine", "Latitude: " + _latitude);
+        //        Log.i("MakeMachine", "Longitude: " + _longitude);
+
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-               // httppost.setEntity(se);
 
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httppost);
@@ -227,7 +303,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 reader.close();
                 String result11 = sb.toString();
-                Log.i("MakeMachine", "HTTP Response made into string: " + result11);
+            //    Log.i("MakeMachine", "HTTP Response made into string: " + result11);
                 return null;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -293,58 +369,6 @@ public class MainActivity extends ActionBarActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-    public class Image {
-
-        //username, user_id, date, lat, lon
-        //{"username": "Bob", "user_id": "123", "date": "some date", "lat": 37, "lon": -122}
-
-
-        /**
-         * My username
-         */
-        public String username;
-
-        /**
-         * My user ID
-         */
-        public String user_id;
-
-        /**
-         * My physical photo data
-         */
-        public ImageView photo;
-
-        /**
-         * The date I was captured
-         */
-        public String date;
-
-        /**
-         * My coordinates as a two element float array
-         */
-        public float[] my_coordinates;
-
-        Image(ImageView foto) {
-            this.photo = foto;
-            this.username = "not specified";
-            this.user_id = "not specified";
-        }
-
-        Image(ImageView foto, String name) {
-            this.photo = foto;
-            this.username = name;
-            this.user_id = "not specified";
-        }
-
-        Image(ImageView foto, String name, String ID) {
-            this.photo = foto;
-            this.username = name;
-            this.user_id = ID;
-        }
-
     }
 
 }
