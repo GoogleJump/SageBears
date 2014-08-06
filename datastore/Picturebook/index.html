@@ -100,19 +100,16 @@
                     }
 
                     google.maps.event.addDomListener(window, 'load', initialize);
-
                 </script>
-
                 <br>
-                
                 {% for image in images %}
                     <!-- add marker if there are latitude and longitude values -->
                     {% if image.lat and image.lon %}
                         {% if image.username %}
                             <script type="text/javascript">
+                                alert({{image.photo}});
                                 var img = new Image();
                                 img.src = "data:image/png;base64,{{image.photo}}";
-
                                 add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", img.src);
                             </script>
 
@@ -127,7 +124,6 @@
 
                 {% endfor %}
             </div>
-
         </div>
     </body>
 </html>
