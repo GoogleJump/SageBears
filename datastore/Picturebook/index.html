@@ -99,11 +99,8 @@
                     }
 
                     google.maps.event.addDomListener(window, 'load', initialize);
-
                 </script>
-
                 <br>
-                
                 {% for image in images %}
                     {% if image.lat and image.lon %}
                         {% if image.username %}
@@ -132,7 +129,6 @@
 
                 {% endfor %}
             </div>
-
         </div>
     </body>
 </html>
