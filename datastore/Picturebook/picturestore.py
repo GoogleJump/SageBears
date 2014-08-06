@@ -91,7 +91,13 @@ class PictureStore(webapp2.RequestHandler):
         image.date = self.request.get('date')
         image.lat = self.request.get('lat')
         image.lon = self.request.get('lon')
+
+        #websafe base64
+        #base64_photo = self.request.get('photo')
+        #image.photo = base64_photo.replace("+", '%2B')
+        #image.photo = base64.urlsafe_b64encode(self.request.get('photo'))
         image.photo = self.request.get('photo')
+
 
         #convert image to string using base64 so we store it and use it in json later
     #    with open(os.path.join(os.path.dirname(__file__), self.request.params["img"].filename), "rb") as imageFile:

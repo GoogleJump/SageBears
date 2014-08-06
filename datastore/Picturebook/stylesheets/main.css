@@ -35,6 +35,15 @@ body {
   font-size: 14px;
   line-height: 1.5;
   font-weight: 300;
+  background-color: #D8D8D8;
+}
+
+h1{
+  font-family: "Impact", sans-serif;
+  font-weight: lighter;
+  font-size: 85px;
+  text-align: center;
+  color: #0B6121;
 }
 
 a, a:visited{

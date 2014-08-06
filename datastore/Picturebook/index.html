@@ -9,9 +9,9 @@
         </script>
     </head>
 
-    <h2 style="text-align: center;">Tag</h2>
-
     <body>
+
+        <h1>Tag</h1>
 
         <div class="ui two column grid stackable">
             
@@ -61,9 +61,8 @@
 
                     function initialize() {
 
-                    }
+                    };
 
-                    // add marker for every photo saved
                     function add_marker(lat, lon, details, photo) {
                         //alert('maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon + '&sensor=true');
                         var geocoder = new google.maps.Geocoder();
@@ -74,7 +73,7 @@
                         geocoder.geocode({'latLng': location}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 if (results[1]) {
-                                    content = content + ' in ' + results[7].formatted_address;
+                                    content = content + ' in ' + results[1].formatted_address;
                                 }
                                 else {
                                     alert('No results found and the status is: ' + status);
@@ -106,19 +105,25 @@
                 <br>
                 
                 {% for image in images %}
-                    <!-- add marker if there are latitude and longitude values -->
                     {% if image.lat and image.lon %}
                         {% if image.username %}
-                            <script type="text/javascript">
-                                var img = new Image();
-                                img.src = "data:image/png;base64,{{image.photo}}";
+                            <img id="photo64" src="data:image/png;base64,{{image.photo}}"></img>
 
-                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", img.src);
+                            <script type="text/javascript">
+                                /*
+                                // var img = new Image();
+                                // img.src = 'data:image/png;base64,{{image.photo}}';
+                                */
+
+                                // add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", img.src);
+
+                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
                             </script>
 
                         {% else %}
                             <script type="text/javascript"> 
                                 add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo", img.src);
+                                // add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
                             </script>
 
                         {% endif %}
