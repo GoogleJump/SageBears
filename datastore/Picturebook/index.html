@@ -104,7 +104,7 @@
                 {% for image in images %}
                     {% if image.lat and image.lon %}
                         {% if image.username %}
-                            <img id="photo64" src="data:image/png;base64,{{image.photo}}"></img>
+                            <img id="photo64" src="data:image/png;base64,{{image.photo}}" style="visibility: hidden;"></img>
 
                             <script type="text/javascript">
                                 /*
