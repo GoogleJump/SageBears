@@ -56,11 +56,11 @@
                 {% for image in images %}
                     {% if image.lat and image.lon %}
                         {% if image.username %}
-                            <img id="photo64" src="data:image/png;base64,{{image.photo}}" style="visibility: hidden;"></img>
+                            <img id="{{image.user_id}}" src="data:image/png;base64,{{image.photo}}" style="visibility: hidden;"></img>
 
                             <script type="text/javascript">
 
-                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
+                                add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", document.getElementById("{{image.user_id}}").src);
                             </script>
 
                         {% else %}
