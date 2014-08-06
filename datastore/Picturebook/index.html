@@ -19,11 +19,11 @@
 
                 <script type="text/javascript">
 
-                    var goog = new google.maps.LatLng(37.386052, -122.083851);
+                    var centerUS = new google.maps.LatLng(40.880034310000916, -102.01904437500436);
 
                     var mapOptions = {
-                        zoom: 6,
-                        center: goog,
+                        zoom: 5,
+                        center: centerUS,
                         mapTypeId: 'roadmap'
                     }
 
@@ -34,26 +34,9 @@
                     };
 
                     function add_marker(lat, lon, details, photo) {
-                        var geocoder = new google.maps.Geocoder();
                         var location = new google.maps.LatLng(parseFloat(lat), parseFloat(lon));
                         var infowindow = new google.maps.InfoWindow();
-                        var content = details;
-
-                        geocoder.geocode({'latLng': location}, function(results, status) {
-                            if (status == google.maps.GeocoderStatus.OK) {
-                                if (results[1]) {
-                                    content = content + ' in ' + results[1].formatted_address;
-                                }
-                                else {
-                                    alert('No results found and the status is: ' + status);
-                                }
-                            }
-                            else {
-                                alert('Geocoder failed due to: ' + status);
-                            }
-                        });
-
-                        content = content + ': <br>' + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">';
+                        var content = details + ': <br>' + '<IMG BORDER="0" HEIGHT="150px" WIDTH="auto" ALIGN="center" SRC="'+ photo + '">';
 
                         var marker = new google.maps.Marker({
                             position: location,
