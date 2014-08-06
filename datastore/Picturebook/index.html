@@ -4,7 +4,6 @@
     <head>
         <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 
-        <!-- -->
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNrgeBzBMFdOTdEJy5Iv3M-vvXOn07LOg">
         </script>
     </head>
@@ -13,42 +12,13 @@
 
         <h1>Tag</h1>
 
-        <div class="ui two column grid stackable">
-            
-            <!-- left column of grid -->
+        <div style="text-align: center;">
+             
             <div class="column">
-                <form action="/store" enctype="multipart/form-data" method="post">
-
-                    <div class="ui form">
-                        <div class="field">
-                            <label>JSON information</label>
-                            <textarea name="given_json"></textarea>
-                        </div>
-                    </div>
-
-                    <div><label>Photo:</label></div>
-                    <div><input type="file" name="img"/></div>
-
-                    <input class="ui small primary green button" type="submit" value="Store Picture Info">
-
-                    <!-- login/logout button -->
-                    <a class="ui small primary red button" href="{{ url|safe }}">{{ url_linktext }}</a>
-                </form>
-                <hr>
-                <form>Picturebook name: 
-                    <input value="default_picturebook" name="picturebook_name">
-                    <input type="submit" value="switch">
-                </form>
-            </div>
-            
-            <!-- right column of grid -->        
-            <div class="column">
-                Stored Pictures
-                <div id="map-canvas" style="width: auto; height: 400px;"></div>
+                <div id="map-canvas" style="width: auto; height: 500px; "></div>
 
                 <script type="text/javascript">
 
-                    //original stuff
                     var goog = new google.maps.LatLng(37.386052, -122.083851);
 
                     var mapOptions = {
@@ -64,7 +34,6 @@
                     };
 
                     function add_marker(lat, lon, details, photo) {
-                        //alert('maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + lon + '&sensor=true');
                         var geocoder = new google.maps.Geocoder();
                         var location = new google.maps.LatLng(parseFloat(lat), parseFloat(lon));
                         var infowindow = new google.maps.InfoWindow();
@@ -104,30 +73,22 @@
                 {% for image in images %}
                     {% if image.lat and image.lon %}
                         {% if image.username %}
-                            <img id="photo64" src="data:image/png;base64,{{image.photo}}"></img>
+                            <img id="photo64" src="data:image/png;base64,{{image.photo}}" style="visibility: hidden;"></img>
 
                             <script type="text/javascript">
-                                /*
-                                // var img = new Image();
-                                // img.src = 'data:image/png;base64,{{image.photo}}';
-                                */
-
-                                // add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", img.src);
 
                                 add_marker({{image.lat}}, {{image.lon}}, "{{ image.username }} on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
                             </script>
 
                         {% else %}
                             <script type="text/javascript"> 
-                                add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo", img.src);
-                                // add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
+                                add_marker({{image.lat}}, {{image.lon}}, "Anonymous on {{ image.date }} submitted this photo", document.getElementById("photo64").src);
                             </script>
 
                         {% endif %}
-
                     {% endif %}
-
                 {% endfor %}
+                
             </div>
         </div>
     </body>
